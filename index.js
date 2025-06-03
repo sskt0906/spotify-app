@@ -1,9 +1,20 @@
 require('dotenv').config();
 const express = require('express');
 const passport = require('passport');
+const session = require('express-session');
 const SpotifyStrategy = require('passport-spotify').Strategy;
 
 const app = express();
+
+// ★ここでセッションミドルウェアを追加（initializeの前！）
+app.use(
+  session({
+    secret: 'your-session-secret', // ランダムな長い文字列にしてください
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: false }, // RenderならfalseでOK
+  })
+);
 
 // Passportの設定
 passport.use(
@@ -19,9 +30,13 @@ passport.use(
     }
   )
 );
-app.use(passport.initialize());
 
-// Spotify認証の入り口ルート
+// ★ここでpassport初期化＆セッション対応
+app.use(passport.initialize());
+app.use(passport.session());
+
+// --- 以降、ルーティングは今のままでOK ---
+
 app.get(
   '/auth/spotify',
   passport.authenticate('spotify', {
@@ -34,12 +49,10 @@ app.get(
   })
 );
 
-// Spotify認証後のコールバック
 app.get(
   '/auth/spotify/callback',
   passport.authenticate('spotify', { failureRedirect: '/' }),
   (req, res) => {
-    // 認証後の処理（例：フロントエンドにリダイレクト）
     res.send('Spotify認証成功！');
   }
 );
