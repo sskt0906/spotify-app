@@ -68,3 +68,12 @@ app.get(
 
 app.get('/', (req, res) => res.send('Server is running!'));
 app.listen(5000, () => console.log('Server started on port 5000'));
+app.get('/api/user', (req, res) => {
+  // ここではaccessTokenをreq.userから取得する例
+  if (!req.user) {
+    return res.status(401).send('Unauthorized');
+  }
+
+  // Spotifyのユーザープロフィール情報を返す
+  res.json(req.user);
+});
