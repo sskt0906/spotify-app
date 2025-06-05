@@ -16,6 +16,15 @@ app.use(
   })
 );
 
+// ★ユーザーのシリアライズ・デシリアライズ（必須！）
+passport.serializeUser((user, done) => {
+  done(null, user); // そのまま全プロフィールを保存する例
+});
+
+passport.deserializeUser((user, done) => {
+  done(null, user); // そのまま全プロフィールを復元
+});
+
 // Passportの設定
 passport.use(
   new SpotifyStrategy(
