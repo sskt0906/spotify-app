@@ -19,6 +19,7 @@
     "jsonwebtoken": "^9.0.2",
     "passport": "^0.7.0",
     "passport-spotify": "^2.0.0",
-    "pg": "^8.16.0"
+    "pg": "^8.16.0",
+    "spotify-web-api-node": "^5.0.2"
   }
 }

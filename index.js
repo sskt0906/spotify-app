@@ -3,7 +3,7 @@ const express = require('express');
 const passport = require('passport');
 const session = require('express-session');
 const SpotifyStrategy = require('passport-spotify').Strategy;
-
+const SpotifyWebApi = require('spotify-web-api-node');
 const app = express();
 
 // ★ここでセッションミドルウェアを追加（initializeの前！）
@@ -34,6 +34,7 @@ passport.use(
       callbackURL: process.env.SPOTIFY_REDIRECT_URI,
     },
     (accessToken, refreshToken, expires_in, profile, done) => {
+      profile.accessToken = accessToken;
       // ここでユーザー情報をDB保存やセッション管理
       return done(null, profile);
     }
@@ -62,7 +63,7 @@ app.get(
   '/auth/spotify/callback',
   passport.authenticate('spotify', { failureRedirect: '/' }),
   (req, res) => {
-    res.send('Spotify認証成功！');
+    res.redirect('/profile'); // 例：Reactの/profileページな
   }
 );
 
@@ -76,4 +77,28 @@ app.get('/api/user', (req, res) => {
 
   // Spotifyのユーザープロフィール情報を返す
   res.json(req.user);
+});
+app.get('/api/user/playlists', async (req, res) => {
+  if (!req.user) {
+    return res.status(401).send('Unauthorized');
+  }
+
+  // ここでaccessTokenを取得（SpotifyStrategyのコールバックで保存しておくと便利）
+  // 例：req.user.accessTokenとして持たせておく
+  const accessToken = req.user.accessToken; // ★
+
+  if (!accessToken) {
+    return res.status(400).send('No access token');
+  }
+
+  // Spotify Web APIクライアントをセットアップ
+  const spotifyApi = new SpotifyWebApi();
+  spotifyApi.setAccessToken(accessToken);
+
+  try {
+    const playlists = await spotifyApi.getUserPlaylists();
+    res.json(playlists.body);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
