@@ -102,3 +102,19 @@ app.get('/api/user/playlists', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+app.get('/profile', (req, res) => {
+  // 認証済みならユーザー情報を表示、未認証ならエラーを返す
+  if (!req.user) {
+    return res
+      .status(401)
+      .send('未ログインです。/auth/spotify からログインしてください。');
+  }
+  // ユーザー名やメールなどをHTMLやテキストで返す例
+  res.send(`
+    <h2>Spotify認証成功！</h2>
+    <p>ユーザー名: ${req.user.displayName || 'No Name'}</p>
+    <p>メール: ${req.user.emails ? req.user.emails[0].value : 'No email'}</p>
+    <pre>${JSON.stringify(req.user, null, 2)}</pre>
+    <a href="/api/user/playlists">あなたのプレイリスト一覧を見る</a>
+  `);
+});
