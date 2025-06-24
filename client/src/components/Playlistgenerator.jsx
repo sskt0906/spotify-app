@@ -5,6 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+const API_URL = import.meta.env.VITE_API_URL;
 
 export default function PlaylistGenerator({ mood }) {
   const [tracks, setTracks] = useState([]);
@@ -19,7 +20,7 @@ export default function PlaylistGenerator({ mood }) {
   useEffect(() => {
     setLoading(true);
     axios
-      .get('http://localhost:5000/api/user/tracks', {
+      .get(`${API_URL}/api/user/tracks`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setTracks(res.data.tracks))
@@ -31,7 +32,7 @@ export default function PlaylistGenerator({ mood }) {
     setCreating(true);
     try {
       const res = await axios.post(
-        'http://localhost:5000/api/playlist',
+        `${API_URL}/api/playlist`,
         { mood, tracks },
         { headers: { Authorization: `Bearer ${token}` } }
       );
