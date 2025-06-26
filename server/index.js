@@ -63,7 +63,9 @@ app.get(
   '/auth/spotify/callback',
   passport.authenticate('spotify', { failureRedirect: '/' }),
   (req, res) => {
-    res.redirect('/profile'); // 例：Reactの/profileページな
+    res.redirect(
+      'https://spotify-a3bp0iys9-takashi-sasakis-projects-9c875311.vercel.app/profile'
+    ); // 例：Reactの/profileページ
   }
 );
 
